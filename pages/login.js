@@ -1,5 +1,46 @@
+import { useAuth } from "../context/AuthUserContext";
+import { useRouter } from "next/router";
+import { useRef, useEffect } from "react";
+
 // Login page: authenticates user
 export default function Login() {
+  const router = useRouter();
+  const { loading, authUser, logIn, createUser } = useAuth();
+  const emailInput = useRef(null);
+  const passwordInput = useRef(null);
+
+  useEffect(() => {
+    if (authUser) {
+      console.log(`Logged In: ${authUser.uid}`);
+      //router.push("/");
+    }
+  }, [authUser, loading, router]);
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    const email = emailInput.current.value;
+    const password = passwordInput.current.value;
+    logIn(email, password)
+      .then(() => {
+        console.log("login");
+        // redirect to index page after login is completed
+        router.push("/");
+      })
+      .catch((error) => {
+        if (error.code === "auth/user-not-found") {
+          createUser(email, password).then(() => {
+            logIn(email, password)
+              .then(() => {
+                console.log("created user");
+                router.push("/");
+              })
+              .catch((error) => {
+                throw new Error(error.message);
+              });
+          });
+        }
+      });
+  };
   return (
     <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="p-10 py-12 shadow-lg bg-white rounded-lg max-w-md w-full space-y-8">
@@ -8,11 +49,12 @@ export default function Login() {
             Sign in to your account
           </h2>
         </div>
-        <form className="mt-8 space-y-6" action="#" method="POST">
+        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label className="sr-only">Email address</label>
               <input
+                ref={emailInput}
                 id="email-address"
                 name="email"
                 type="email"
@@ -25,6 +67,7 @@ export default function Login() {
             <div>
               <label className="sr-only">Password</label>
               <input
+                ref={passwordInput}
                 id="password"
                 name="password"
                 type="password"
@@ -64,14 +107,7 @@ export default function Login() {
               Not registered?
             </div>
 
-            <div className="text-sm">
-              <a
-                href="#"
-                className="font-medium text-indigo-600 hover:text-indigo-500"
-              >
-                Create an account
-              </a>
-            </div>
+            <div className="text-sm">An account will be created.</div>
           </div>
         </form>
       </div>
