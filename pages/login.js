@@ -107,7 +107,9 @@ export default function Login() {
               Not registered?
             </div>
 
-            <div className="text-sm">An account will be created.</div>
+            <div className="text-sm">
+              No worries! An account will be automatically created.
+            </div>
           </div>
         </form>
       </div>

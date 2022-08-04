@@ -1,24 +1,12 @@
 import { useRef, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "../context/AuthUserContext";
-/*
-Register page: user should be able to register a new sale with all info
-sale: {
-  client,
-  seller,
-  product,
-  price,
-  date,
-  commission
-}
- */
+import Link from "next/link";
+import { getUsers } from "../lib/sanityData";
 
-export default function Register() {
+export default function Register({ sellers }) {
   const router = useRouter();
-  // this info will come from db
-  const sellerOptions = ["Jane", "Clare", "John", "Harry"];
   const client = useRef(null);
-  const seller = useRef(null);
   const product = useRef(null);
   const price = useRef(null);
   const date = useRef(null);
@@ -31,8 +19,12 @@ export default function Register() {
     }
   }, [loading, authUser, router]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    // get user object that matches seller logged in
+    const seller = sellers.filter(
+      (seller) => seller.authUserId === authUser.uid
+    )[0];
     const extraPercent = true; // (monthSells > 10000)
     const firstAbove800 = false;
     const firstAbove1200 = false;
@@ -61,17 +53,18 @@ export default function Register() {
     if (!successful) {
       return false;
     }
-    const obj = {
-      clientName: client.current.value,
-      sellerName: seller.current.value,
-      productName: product.current.value,
-      productPrice: price.current.value,
+    const doc = {
+      client: client.current.value,
+      seller: seller._id,
+      product: product.current.value,
+      price: parseFloat(price.current.value),
       date: date.current.value,
-      commissionValue: commission,
+      commission: parseFloat(commission.toFixed(2)),
+      status: "pending",
     };
-    console.log(obj);
+    updateSanity(doc);
+    console.log(doc);
     client.current.value = "";
-    seller.current.value = "";
     product.current.value = "";
     price.current.value = "";
     date.current.value = "";
@@ -80,88 +73,86 @@ export default function Register() {
   const dateMax = new Date().toLocaleDateString("en-ca");
   return (
     authUser && (
-      <div className="mt-6 mx-auto w-fit flex flex-col justify-center bg-slate-100 shadow-lg p-4 rounded-lg">
-        <form onSubmit={handleSubmit}>
-          <h2 className="text-slate-900 text-lg mb-2 font-medium">
-            Register New Sale
-          </h2>
-          <label className="block m-1">
-            <span className="block text-sm font-medium text-slate-700">
-              Client name
-            </span>
+      <div>
+        <Link href="/">
+          <a className="flex justify-end m-2 p-2 text-slate-700">
+            Return to homepage
+          </a>
+        </Link>
+        <div className="mt-6 mx-auto w-fit flex flex-col justify-center bg-slate-100 shadow-lg p-4 rounded-lg">
+          <form onSubmit={handleSubmit}>
+            <h2 className="text-slate-900 text-lg mb-2 font-medium">
+              Register New Sale
+            </h2>
+            <label className="block m-1">
+              <span className="block text-sm font-medium text-slate-700">
+                Client name
+              </span>
+              <input
+                ref={client}
+                required
+                placeholder="E.g. Jane Doe"
+                type="text"
+                className="rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              />
+            </label>
+            <label className="block m-1">
+              <span className="block text-sm font-medium text-slate-700">
+                Product name
+              </span>
+              <input
+                ref={product}
+                required
+                placeholder="E.g. Magic wand"
+                type="text"
+                className="rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              />
+            </label>
+            <label className="block m-1">
+              <span className="block text-sm font-medium text-slate-700">
+                Price R$
+              </span>
+              <input
+                min="0"
+                ref={price}
+                required
+                step=".01"
+                placeholder="E.g. 249.90"
+                type="number"
+                className="rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              />
+            </label>
+            <label className="block m-1">
+              <span className="block text-sm font-medium text-slate-700">
+                Date
+              </span>
+              <input
+                ref={date}
+                required
+                type="date"
+                max={dateMax}
+                className="rounded-none relative block w-full px-3 py-2 border border-gray-300 invalid:text-grey-500 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              />
+            </label>
             <input
-              ref={client}
-              required
-              placeholder="E.g. Jane Doe"
-              type="text"
-              className="rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              type="submit"
+              value="submit"
+              className="uppercase font-semibold text-xs flex ml-auto px-5 mt-4 p-2 rounded-lg hover:bg-slate-900 hover:text-slate-100 bg-slate-400 text-slate-900"
             />
-          </label>
-          <label className="block m-1">
-            <span className="block text-sm font-medium text-slate-700">
-              Seller
-            </span>
-            <select
-              ref={seller}
-              required
-              className="rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-            >
-              {sellerOptions.map((option, index) => (
-                //change key and value in the future to match seller id
-                <option key={index} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block m-1">
-            <span className="block text-sm font-medium text-slate-700">
-              Product name
-            </span>
-            <input
-              ref={product}
-              required
-              placeholder="E.g. Magic wand"
-              type="text"
-              className="rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-            />
-          </label>
-          <label className="block m-1">
-            <span className="block text-sm font-medium text-slate-700">
-              Price R$
-            </span>
-            <input
-              min="0"
-              ref={price}
-              required
-              step=".01"
-              placeholder="E.g. 249.90"
-              type="number"
-              className="rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-            />
-          </label>
-          <label className="block m-1">
-            <span className="block text-sm font-medium text-slate-700">
-              Date
-            </span>
-            <input
-              ref={date}
-              required
-              type="date"
-              max={dateMax}
-              className="rounded-none relative block w-full px-3 py-2 border border-gray-300 invalid:text-grey-500 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-            />
-          </label>
-          <input
-            type="submit"
-            value="submit"
-            className="uppercase font-semibold text-xs flex ml-auto px-5 mt-4 p-2 rounded-lg hover:bg-slate-900 hover:text-slate-100 bg-slate-400 text-slate-900"
-          />
-        </form>
-        <div className="invisible">
-          Inform User whether submit was successful
+          </form>
+          <div className="invisible">
+            Inform User whether submit was successful
+          </div>
         </div>
       </div>
     )
   );
+}
+export async function getStaticProps() {
+  const sellers = await getUsers();
+  return {
+    props: {
+      sellers,
+    },
+  };
 }
