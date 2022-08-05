@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { CaretDoubleRight } from "phosphor-react";
 import { useEffect } from "react";
 import { useAuth } from "../context/AuthUserContext";
+import { getSalesIds } from "../lib/sanityData";
 
 const Card = ({ page }) => {
   const { title, subtext, link } = page;

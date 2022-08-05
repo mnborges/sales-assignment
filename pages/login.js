@@ -1,37 +1,38 @@
 import { useAuth } from "../context/AuthUserContext";
 import { useRouter } from "next/router";
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
+import { createSanityUser } from "../lib/sanityData";
 
 // Login page: authenticates user
 export default function Login() {
   const router = useRouter();
-  const { loading, authUser, logIn, createUser } = useAuth();
+  const { logIn, createUser } = useAuth();
+  // using useRef hook to gather input values instead of useState
   const emailInput = useRef(null);
   const passwordInput = useRef(null);
 
-  useEffect(() => {
-    if (authUser) {
-      console.log(`Logged In: ${authUser.uid}`);
-      //router.push("/");
-    }
-  }, [authUser, loading, router]);
-
   const handleLogin = (e) => {
+    // prevent page from reloading after submiting the login form
     e.preventDefault();
     const email = emailInput.current.value;
     const password = passwordInput.current.value;
     logIn(email, password)
       .then(() => {
-        console.log("login");
-        // redirect to index page after login is completed
+        // redirect to index page if login was successful
         router.push("/");
       })
       .catch((error) => {
+        // if user is not registered, should sign them up
+        // TODO: better create an signup page later on
         if (error.code === "auth/user-not-found") {
-          createUser(email, password).then(() => {
+          createUser(email, password).then((res) => {
+            // then create new sanity user document with resulting uid
+            createSanityUser(res.user.uid, false).catch((error) => {
+              throw new Error(error.message);
+            });
+            // then authenticate user and redirect to homepage
             logIn(email, password)
               .then(() => {
-                console.log("created user");
                 router.push("/");
               })
               .catch((error) => {
@@ -107,8 +108,8 @@ export default function Login() {
               Not registered?
             </div>
 
-            <div className="text-sm">
-              No worries! An account will be automatically created.
+            <div className="text-sm text-gray-900">
+              An account will be created.
             </div>
           </div>
         </form>
