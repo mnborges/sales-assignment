@@ -67,7 +67,6 @@ const Edit = ({ sale }) => {
           Return to homepage
         </a>
       </Link>
-      <p>Sale: {sale._id}</p>
       <div className="mt-6 mx-auto w-fit flex flex-col justify-center bg-slate-100 shadow-lg p-4 rounded-lg">
         <form onSubmit={handleSubmit}>
           <h2 className="text-slate-900 text-lg mb-2 font-medium">Edit Sale</h2>
@@ -126,11 +125,25 @@ const Edit = ({ sale }) => {
               className="rounded-none relative block w-full px-3 py-2 border border-gray-300 invalid:text-grey-500 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
             />
           </label>
-          <input
-            type="submit"
-            value="submit"
-            className="uppercase font-semibold text-xs flex ml-auto px-5 mt-4 p-2 rounded-lg hover:bg-slate-900 hover:text-slate-100 bg-slate-400 text-slate-900"
-          />
+          <div className="flex flex-row gap-1 justify-between mt-4">
+            <button
+              onClick={() => router.push("/sales")}
+              type="button"
+              value="cancel"
+              data-bs-toggle="tooltip"
+              title="Cancel edit and return to sales page"
+              className="uppercase font-semibold text-xs flex px-5 p-2 rounded-lg hover:bg-slate-900 hover:text-slate-100 bg-slate-100 text-slate-900"
+            >
+              Cancel
+            </button>
+            <input
+              type="submit"
+              value="submit"
+              data-bs-toggle="tooltip"
+              title="Save changes and return to sales page"
+              className="uppercase font-semibold text-xs flex ml-auto px-5 p-2 rounded-lg hover:bg-slate-900 hover:text-slate-100 bg-slate-400 text-slate-900"
+            />
+          </div>
         </form>
       </div>
     </div>

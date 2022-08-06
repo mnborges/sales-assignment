@@ -1,45 +1,77 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { PencilSimpleLine, TrashSimple } from "phosphor-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthUserContext";
-import { getSales } from "../lib/sanityData";
+import { getSales, deleteSale } from "../lib/sanityData";
 
 const SHOULD_MOCK = false;
 
 /*
 Sales page: listing of all registered sales
  */
-const SaleCard = ({ sale }) => {
+const SaleCard = ({ sale, handler }) => {
   const [extendedContent, setExtendedContent] = useState(false);
 
-  const toggleExpand = () => setExtendedContent(!extendedContent);
-  const { client, seller, product, price, date, commission } = sale;
+  const toggleExpand = (e) => {
+    // if user clicked a button just skip the toggle
+    if (e.target.type === "button" || e.target.parentNode.type === "button")
+      return;
+    setExtendedContent(!extendedContent);
+  };
+  const { client, seller, product, price, date, commission, _id } = sale;
+  const { editSale, removeSale } = handler;
   return (
-    <button
-      className="group rounded-lg shadow-lg flex hover:ring-2 "
+    <div
+      className="relative group rounded-lg shadow-lg flex hover:ring-2 "
       data-bs-toggle="tooltip"
       title={`Click to view ${extendedContent ? "less" : "more"} information`}
       onClick={toggleExpand}
     >
-      <div className="flex-grow rounded-lg p-2 max-w-full bg-slate-100 relative">
+      <div className="top-3 right-1 invisible group-hover:visible absolute z-20 flex items-center justify-center">
+        <div
+          className="inline-flex shadow-md hover:shadow-lg focus:shadow-lg"
+          role="group"
+        >
+          <button
+            onClick={() => editSale(_id)}
+            type="button"
+            data-bs-toggle="tooltip"
+            title="Edit sale"
+            className="rounded-l inline-block p-2 bg-slate-400 bg-opacity-50 hover:bg-slate-500 hover:opacity-100 text-white font-medium text-xs leading-tight uppercase  focus:bg-slate-500 focus:outline-none focus:ring-0 active:bg-slate-800 transition duration-150 ease-in-out"
+          >
+            <PencilSimpleLine size={18} type="button" />
+          </button>
+          <button
+            onClick={() => removeSale(_id)}
+            type="button"
+            data-bs-toggle="tooltip"
+            title="Delete sale"
+            className=" rounded-r inline-block p-2 bg-slate-400 bg-opacity-50 hover:bg-slate-500 hover:opacity-100 text-white font-medium text-xs leading-tight uppercase  focus:bg-slate-500 focus:outline-none focus:ring-0 active:bg-slate-800 transition duration-150 ease-in-out"
+          >
+            <TrashSimple size={18} />
+          </button>
+        </div>
+      </div>
+      <div className="flex flex-col flex-grow rounded-lg p-2 max-w-full bg-slate-100 relative">
         <div className="text-slate-500 text-xs mr-auto absolute ">{date}</div>
         <h1 className="text-slate-900 text-lg leading-none font-medium mx-auto">
           {product}
         </h1>
-        <p className="text-slate-700 text-base">R$ {price}</p>
+        <p className="text-center text-slate-700 text-base">R$ {price}</p>
         <div
           className={(extendedContent ? "block " : "hidden ").concat(
-            "text-slate-900"
+            "text-slate-900 text-center"
           )}
         >
           Sold to <b>{client}</b> by <b>{seller.email}</b>
-          <div className="text-sm text-blue-900">
+          <div className="text-center text-sm text-blue-900">
             <b>Commission (R$): </b>
             {commission}
           </div>
         </div>
       </div>
-    </button>
+    </div>
   );
 };
 
@@ -60,6 +92,21 @@ export default function Sales({ sales }) {
     }
     return acc;
   }, []);
+  const buttonHandler = {
+    editSale: (sid) => {
+      // redirect to edit page
+      router.push(`manage/${sid}`);
+    },
+    removeSale: (sid) => {
+      deleteSale(sid)
+        // force page reload after delete is made
+        // TODO: could update DOM removing SaleCard with an animation instead of reloading
+        .then(() => router.reload("/sales"))
+        .catch((error) => {
+          throw new Error(error.message);
+        });
+    },
+  };
   return (
     authUser && (
       <div>
@@ -73,7 +120,13 @@ export default function Sales({ sales }) {
           <div className="flex flex-col gap-2 w-10/12">
             {reducedSales &&
               reducedSales.map((sale) => {
-                return <SaleCard key={sale._id} sale={sale} />;
+                return (
+                  <SaleCard
+                    key={sale._id}
+                    sale={sale}
+                    handler={buttonHandler}
+                  />
+                );
               })}
             {!reducedSales.length && (
               <div className="inline-block">
