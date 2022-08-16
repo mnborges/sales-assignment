@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { PencilSimpleLine, TrashSimple } from "phosphor-react";
 import { useEffect, useState } from "react";
+import Layout from "../components/layout";
 import { useAuth } from "../context/AuthUserContext";
 import { getSales, deleteSale } from "../lib/sanityData";
 
@@ -11,10 +12,11 @@ const SHOULD_MOCK = false;
 Sales page: listing of all registered sales
  */
 const SaleCard = ({ sale, handler }) => {
+  // create state hook for each card to expand/shrink content
   const [extendedContent, setExtendedContent] = useState(false);
 
   const toggleExpand = (e) => {
-    // if user clicked a button just skip the toggle
+    // if user clicked a button just skip the toggle -- parentNode to work if user clicks an icon
     if (e.target.type === "button" || e.target.parentNode.type === "button")
       return;
     setExtendedContent(!extendedContent);
@@ -23,7 +25,7 @@ const SaleCard = ({ sale, handler }) => {
   const { editSale, removeSale } = handler;
   return (
     <div
-      className="relative group rounded-lg shadow-lg flex hover:ring-2 "
+      className="cursor-pointer relative group rounded-lg shadow-lg flex hover:ring-2 "
       data-bs-toggle="tooltip"
       title={`Click to view ${extendedContent ? "less" : "more"} information`}
       onClick={toggleExpand}
@@ -58,7 +60,9 @@ const SaleCard = ({ sale, handler }) => {
         <h1 className="text-slate-900 text-lg leading-none font-medium mx-auto">
           {product}
         </h1>
-        <p className="text-center text-slate-700 text-base">R$ {price}</p>
+        <p className="text-center text-slate-700 text-base">
+          R$ {price.toFixed(2)}
+        </p>
         <div
           className={(extendedContent ? "block " : "hidden ").concat(
             "text-slate-900 text-center"
@@ -67,7 +71,7 @@ const SaleCard = ({ sale, handler }) => {
           Sold to <b>{client}</b> by <b>{seller.email}</b>
           <div className="text-center text-sm text-blue-900">
             <b>Commission (R$): </b>
-            {commission}
+            {commission.toFixed(2)}
           </div>
         </div>
       </div>
@@ -95,7 +99,7 @@ export default function Sales({ sales }) {
   const buttonHandler = {
     editSale: (sid) => {
       // redirect to edit page
-      router.push(`manage/${sid}`);
+      router.push(`edit/${sid}`);
     },
     removeSale: (sid) => {
       deleteSale(sid)

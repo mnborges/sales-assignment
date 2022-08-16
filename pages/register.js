@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthUserContext";
 import Link from "next/link";
 import { createSale, getAuthenticatedUser } from "../lib/sanityData";
 import calculateCommission from "../lib/commission";
+import Layout from "../components/layout";
 
 export default function Register() {
   const router = useRouter();
@@ -52,11 +53,6 @@ export default function Register() {
   return (
     authUser && (
       <div>
-        <Link href="/">
-          <a className="flex justify-end m-2 p-2 text-slate-700">
-            Return to homepage
-          </a>
-        </Link>
         <div className="mt-6 mx-auto w-fit flex flex-col justify-center bg-slate-100 shadow-lg p-4 rounded-lg">
           <form onSubmit={handleSubmit}>
             <h2 className="text-slate-900 text-lg mb-2 font-medium">
@@ -123,3 +119,7 @@ export default function Register() {
     )
   );
 }
+
+Register.getLayout = function getLayout(page) {
+  return <Layout>{page}</Layout>;
+};

@@ -1,11 +1,13 @@
 import "../styles/globals.css";
-import "../config";
+import "../auth/firebaseConfig";
 import { AuthUserProvider } from "../context/AuthUserContext";
 
 function MyApp({ Component, pageProps }) {
+  const getLayout = Component.getLayout || ((page) => page);
+
   return (
     <AuthUserProvider>
-      <Component {...pageProps} />
+      {getLayout(<Component {...pageProps} />)}
     </AuthUserProvider>
   );
 }

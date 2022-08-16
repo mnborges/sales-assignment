@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "studio:dev": "npm --prefix studio run start",
+    "studio:deploy": "npx vercel env pull && npm --prefix studio run deploy"
   },
   "dependencies": {
     "firebase": "^9.9.1",

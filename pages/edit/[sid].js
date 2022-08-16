@@ -6,13 +6,13 @@ import calculateCommission from "../../lib/commission";
 import { getSaleById, getSalesIds, updateSale } from "../../lib/sanityData";
 
 const Edit = ({ sale }) => {
-  const router = useRouter();
-  const { loading, authUser } = useAuth();
   const [clientName, setClientName] = useState(sale.client);
   const [productName, setProducName] = useState(sale.product);
   const [price, setPrice] = useState(sale.price);
   const [date, setDate] = useState(sale.date);
 
+  const { loading, authUser } = useAuth();
+  const router = useRouter();
   useEffect(() => {
     // user not registered
     if (!loading && !authUser) {
@@ -24,7 +24,7 @@ const Edit = ({ sale }) => {
     return <div>Loading...</div>;
   }
   // prevent who's not sale's seller to edit it
-  if (!loading && authUser.uid !== sale.seller.authUserId) {
+  else if (authUser?.uid !== sale.seller.authUserId) {
     return <h1 className="text-4xl p-6 text-center">Not allowed.</h1>;
   }
   const handleSubmit = async (e) => {

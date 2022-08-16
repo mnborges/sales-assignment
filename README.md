@@ -13,13 +13,17 @@ Em uma outra página ele vai poder conferir as suas comissões por venda, de aco
 Seu manager, vai poder aprovar ou reprovar uma venda, e a comissão só será visível após a aprovação. O vendedor não pode ver a página de aprovação de venda do manager, e o manager não pode lançar vendas.
 
 ## Recomendação
+
 Faça o clone desse projeto e inicie o repositorio em seu computador. Esse repositório só vem com o Next.js pré instalado.
 
 ```
 yarn install
 ```
+
 ## REGRAS
+
 **Páginas:**
+
 - Login
 - Cadastro de vendas
 - Listagem de vendas
@@ -27,6 +31,7 @@ yarn install
 - Visualização de comissão de cada venda (a forma de visualização é de acordo com o desenvolvedor).
 
 **Tecnologias Obrigatorias:**
+
 - Framework: Next.js (JavaScript)
 - Database: Sanity.io
 - Autenticação: Firebase
@@ -34,10 +39,13 @@ yarn install
 **CSS Framework:**
 
 (O desenvolvedor pode escolher qual framework CSS ele deseja utilizar)
+
 - Material UI é preferencial, porém, se não souber, não perca tempo aprendendo, use o framework CSS ou CSS Vailla que você for mais confortável.
 
 ### Schema desejado
+
 Venda:
+
 - id (objectId)
 - nome do cliente (string)
 - vendedor (referenceId)
@@ -48,11 +56,13 @@ Venda:
 - comissão (number) [opcional]
 
 User: (Opcional, se quiser usar apenas o auth user é possivel, porém se for para o objetivo bonus, é necessário criar um schema para o user)
+
 - id (objectId)
 - authUserId (ID do usuário do Firebase)
 - role (string) admin ou vendedor
 
 **Regra da comissão:**
+
 - Vendas de até 400 reais: comissão de 1%
 - Vendas de 400 a 800 reais: comissão de 2%
 - Vendas de 800 a 1200 reais: comissão de 3% com bonus de 50 reais para a primeira do mês.
@@ -61,14 +71,29 @@ User: (Opcional, se quiser usar apenas o auth user é possivel, porém se for pa
 Se as vendas totais do mês passarem de 10.000 reais, cada venda após bater esse valor terá um bonus de 1%.
 
 ### Deployment
+
 - Ao final do projeto, o desenvolvedor deve fazer o deploy do projeto em https://vercel.com/.
 
 ### Requerir avaliação
+
 Se você terminou o projeto, preencha o formulário abaixo:
+
 - https://forms.gle/pH9iRZhSWMSvNyw66
 
 ### Dicas:
+
 Leia as documentações:
+
 - https://nextjs.org/docs/getting-started
 - https://www.sanity.io/docs/overview-introduction
 - https://firebase.google.com/docs/auth
+
+## Set up environment variables
+
+Copy the [`.env.local.example`] file in this directory to `.env.local` (which will be ignored by Git):
+
+```bash
+cp .env.local.example .env.local
+```
+
+Then set variables following the description under [auth](auth/) (Firebase configuration) and [studio](studio/) (Sanity configuration).

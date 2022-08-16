@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { CaretDoubleRight } from "phosphor-react";
 import { useEffect } from "react";
 import { useAuth } from "../context/AuthUserContext";
-import { getSalesIds } from "../lib/sanityData";
+import Layout from "../components/layout";
 
 const Card = ({ page }) => {
   const { title, subtext, link } = page;
@@ -17,7 +17,7 @@ const Card = ({ page }) => {
           <p className="text-slate-700 text-base mb-4">{subtext}</p>
         </div>
         <div className="rounded-r-lg flex p-5 bg-blue-300 group-hover:bg-blue-500">
-          <span className="my-auto">
+          <span className="my-auto group-hover:translate-x-2 transition-all">
             <CaretDoubleRight size={24} />
           </span>
         </div>
@@ -40,23 +40,10 @@ export default function Home() {
       router.push("/login");
     }
   }, [loading, authUser, router]);
-  const handleSignOut = (e) => {
-    e.preventDefault();
-    logOut()
-      .then(router.push("/login"))
-      .catch((e) => console.log(e));
-  };
   // if user is not yet logged in, redirect to login page
   return (
     authUser && (
       <div>
-        <button
-          className="p-2 rounded-lg bg-red-300 hover:bg-red-700"
-          onClick={handleSignOut}
-          value="Log Out"
-        >
-          Log Out
-        </button>
         <div className="p-10 my-5">
           <h1 className=" leading-relaxed text-7xl font-bold text-center text-slate-900">
             Saleasy
@@ -74,3 +61,7 @@ export default function Home() {
     )
   );
 }
+
+Home.getLayout = function getLayout(page) {
+  return <Layout>{page}</Layout>;
+};

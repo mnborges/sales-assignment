@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/studio/node_modules
 /.pnp
 .pnp.js
 
@@ -14,6 +15,7 @@
 
 # production
 /build
+/studio/dist
 
 # misc
 .DS_Store
@@ -30,3 +32,10 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# Env files created by scripts for working locally
+.env
+studio/.env.development
+
+# Ignore /studio for now
+/studio
