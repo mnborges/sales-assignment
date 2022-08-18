@@ -23,6 +23,7 @@ export default function Navbar({ page }) {
       .then(router.push("/login"))
       .catch((e) => console.error(e));
   };
+
   return (
     !loading && (
       <nav className=" rounded text-slate-700 bg-blue-300 p-2 w-full sticky top-0 flex flex-row justify-start ">

@@ -1,7 +1,6 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "../context/AuthUserContext";
-import Link from "next/link";
 import { createSale, getAuthenticatedUser } from "../lib/sanityData";
 import calculateCommission from "../lib/commission";
 import Layout from "../components/layout";
@@ -13,13 +12,31 @@ export default function Register() {
   const price = useRef(null);
   const date = useRef(null);
   const { loading, authUser } = useAuth();
+  const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
     //user not registered
     if (!loading && !authUser) {
       router.push("/login");
     }
+    //user logged in
+    if (!loading && authUser) {
+      // IIFE to update userRole state
+      (async () => await getAuthenticatedUser(authUser.uid))()
+        .then(({ role }) => {
+          setUserRole(role);
+        })
+        .catch((e) => {
+          throw new Error(e.message);
+        });
+    }
   }, [loading, authUser, router]);
+
+  if (loading || !userRole) return;
+  // prevent who's not sale's seller to edit it
+  else if (userRole !== "salesman") {
+    return <h1 className="text-4xl p-6 text-center">Not allowed.</h1>;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -121,5 +138,5 @@ export default function Register() {
 }
 
 Register.getLayout = function getLayout(page) {
-  return <Layout>{page}</Layout>;
+  return <Layout title="Register a new sale">{page}</Layout>;
 };

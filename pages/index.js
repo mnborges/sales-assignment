@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { CaretDoubleRight } from "phosphor-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthUserContext";
 import Layout from "../components/layout";
+import { getAuthenticatedUser } from "../lib/sanityData";
 
 const Card = ({ page }) => {
   const { title, subtext, link } = page;
@@ -27,20 +28,37 @@ const Card = ({ page }) => {
 };
 // Should introduce user to the app and provide links to all other pages
 export default function Home() {
+  const [userRole, setUserRole] = useState(null);
+  const { authUser, loading } = useAuth();
+  const router = useRouter();
   const pages = [
-    { title: "Register", subtext: "Register a new sale", link: "register" },
-    { title: "Manage", subtext: "Edit or remove a sale", link: "manage" },
     { title: "Sales", subtext: "Check out registered sales", link: "sales" },
   ];
-  const { logOut, authUser, loading } = useAuth();
-  const router = useRouter();
+  if (userRole === "salesman") {
+    console.log("push");
+    pages.push({
+      title: "Register",
+      subtext: "Register a new sale",
+      link: "register",
+    });
+  }
   useEffect(() => {
     //user not registered
-    if (!loading && !authUser) {
-      router.push("/login");
+    if (!loading && !authUser) router.push("/login");
+    //user logged in
+    if (!loading && authUser) {
+      // IIFE to update userRole state
+      (async () => await getAuthenticatedUser(authUser.uid))()
+        .then(({ role }) => {
+          setUserRole(role);
+        })
+        .catch((e) => {
+          throw new Error(e.message);
+        });
     }
   }, [loading, authUser, router]);
-  // if user is not yet logged in, redirect to login page
+
+  if (loading || !userRole) return;
   return (
     authUser && (
       <div>
@@ -53,7 +71,7 @@ export default function Home() {
           </p>
         </div>
         <div className="mt-5 flex flex-row justify-evenly gap-2 flex-wrap">
-          {pages.map((page, index) => (
+          {pages?.map((page, index) => (
             <Card key={index} page={page} />
           ))}
         </div>
