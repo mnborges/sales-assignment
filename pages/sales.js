@@ -13,6 +13,80 @@ import {
 
 const SHOULD_MOCK = false;
 
+const MonthSummary = ({ sales }) => {
+  const month = new Date().getUTCMonth();
+  const monthName = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ][month];
+  // create an object with summary of this month's sales
+  const summary = sales.reduce(
+    (acc, sale) => {
+      // skip counter if sale was not made this month
+      if (new Date(Date.parse(sale.date)).getUTCMonth() !== month) return acc;
+      if (sale.status === "approved") {
+        acc.approved++;
+        acc.commission += sale.commission;
+        acc.total += sale.price;
+      } else if (sale.status === "rejected") acc.rejected++;
+      else acc.pending++;
+      acc.counter++;
+      return acc;
+    },
+    {
+      rejected: 0,
+      approved: 0,
+      pending: 0,
+      commission: 0,
+      counter: 0,
+      total: 0,
+    }
+  );
+  return (
+    <div className="shadow-md border border-slate-900 w-10/12 leading-tight mt-4 rounded-lg p-2 block text-center">
+      <h1 className="text-lg text-slate-900 font-bold">{`${monthName}'s Summary`}</h1>
+      <p className="text-base mt-2">
+        <span>
+          Total ammount sold: <b>R${summary.total}</b>
+        </span>
+        <br />
+        Accumulated commission:{" "}
+        <b className="text-blue-900">R${summary.commission.toFixed(2)}</b>
+      </p>
+      <p className="mt-2 text-white flex gap-2 justify-center">
+        <span className="bg-red-400 px-2 rounded-xl">
+          <span className="mr-1 inline-block align-baseline bg-red-600 px-2 text-xs rounded-full">
+            {summary.rejected}
+          </span>
+          rejected
+        </span>
+        <span className="bg-blue-400 px-2 rounded-xl">
+          <span className="mr-1 inline-block align-baseline bg-blue-600 px-2 text-xs rounded-full">
+            {summary.approved}
+          </span>
+          approved
+        </span>
+        <span className="bg-slate-400 px-2 rounded-xl">
+          <span className="mr-1 inline-block align-baseline bg-slate-600 px-2 text-xs rounded-full">
+            {summary.pending}
+          </span>
+          pending
+        </span>
+      </p>
+    </div>
+  );
+};
+
 export default function Sales({ sales }) {
   const { loading, authUser } = useAuth();
   const router = useRouter();
@@ -68,8 +142,8 @@ export default function Sales({ sales }) {
     authUser && (
       <>
         <div className="flex flex-col items-center">
-          <h1 className="my-5 text-3xl font-bold">Sales page</h1>
-          <div className="flex flex-col gap-2 w-10/12">
+          {userRole === "salesman" && <MonthSummary sales={filteredSales} />}
+          <div className="mt-4 flex flex-col gap-2 w-10/12">
             {filteredSales.map((sale) => {
               return (
                 <SaleCard

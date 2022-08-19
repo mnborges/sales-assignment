@@ -35,7 +35,6 @@ export default function Home() {
     { title: "Sales", subtext: "Check out registered sales", link: "sales" },
   ];
   if (userRole === "salesman") {
-    console.log("push");
     pages.push({
       title: "Register",
       subtext: "Register a new sale",

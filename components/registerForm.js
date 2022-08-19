@@ -1,29 +1,32 @@
 import { useRouter } from "next/router";
 import { useState } from "react";
 import calculateCommission from "../lib/commission";
-import { updateSale } from "../lib/sanityData";
+import {
+  getAuthenticatedUser,
+  updateSale,
+  createSale,
+} from "../lib/sanityData";
 
-export default function RegisterForm({ sale = false }) {
+export default function RegisterForm({ sale = false, authUser }) {
   const [clientName, setClientName] = useState(sale ? sale.client : "");
   const [productName, setProducName] = useState(sale ? sale.product : "");
-  const [price, setPrice] = useState(sale ? sale.price : 0);
+  const [price, setPrice] = useState(sale ? sale.price : "");
   const [date, setDate] = useState(sale ? sale.date : "");
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (
-      !confirm(
-        "Please confirm you'd like to submit these changes.\nOnce you do, the sale will be pending approval."
-      )
-    )
-      return false;
-    // recalculate commission and update sanity content lake
+    // calculate commission
     const commission = await calculateCommission(price);
+    // prepare object to create/update document in sanity's content lake
     const doc = {
       client: clientName,
       seller: {
-        _ref: sale.seller._id,
+        _ref: sale
+          ? // sale already has seller's info
+            sale.seller._id
+          : // get seller's id
+            (await getAuthenticatedUser(authUser.uid))?._id,
         _type: "reference",
       },
       product: productName,
@@ -32,6 +35,29 @@ export default function RegisterForm({ sale = false }) {
       commission: commission,
       status: "pending",
     };
+    if (!sale) {
+      // Submit a new sale by creating new sanity's document
+      createSale(doc)
+        .then(() => {
+          alert("Sale successfully created.");
+          setClientName("");
+          setProducName("");
+          setPrice("");
+          setDate("");
+        })
+        .catch((error) => {
+          throw new Error(error.message);
+        });
+      return;
+    }
+    // Submit sale's edition
+    if (
+      !confirm(
+        "Please confirm you'd like to submit these changes.\nOnce you do, the sale will be pending approval."
+      )
+    )
+      return false;
+    // update sanity content lake
     return await updateSale(sale._id, doc)
       .then(() => {
         alert("Sale successfully updated.");
@@ -46,7 +72,9 @@ export default function RegisterForm({ sale = false }) {
   return (
     <div className="mt-6 mx-auto w-fit flex flex-col justify-center bg-slate-100 shadow-lg p-4 rounded-lg">
       <form onSubmit={(e) => handleSubmit(e)}>
-        <h2 className="text-slate-900 text-lg mb-2 font-medium">Edit Sale</h2>
+        <h2 className="text-slate-900 text-lg mb-2 font-medium">
+          {!sale ? "Register Sale" : "Edit Sale"}
+        </h2>
         <label className="block m-1">
           <span className="block text-sm font-medium text-slate-700">
             Client name
@@ -101,21 +129,27 @@ export default function RegisterForm({ sale = false }) {
           />
         </label>
         <div className="flex flex-row gap-1 justify-between mt-4">
-          <button
-            onClick={() => router.push("/sales")}
-            type="button"
-            value="cancel"
-            data-bs-toggle="tooltip"
-            title="Cancel edit and return to sales page"
-            className="uppercase font-semibold text-xs flex px-5 p-2 rounded-lg hover:bg-slate-900 hover:text-slate-100 bg-slate-100 text-slate-900"
-          >
-            Cancel
-          </button>
+          {sale && (
+            <button
+              onClick={() => router.push("/sales")}
+              type="button"
+              value="cancel"
+              data-bs-toggle="tooltip"
+              title="Cancel edit and return to sales page"
+              className="uppercase font-semibold text-xs flex px-5 p-2 rounded-lg hover:bg-slate-900 hover:text-slate-100 bg-slate-100 text-slate-900"
+            >
+              Cancel
+            </button>
+          )}
           <input
             type="submit"
             value="submit"
             data-bs-toggle="tooltip"
-            title="Save changes and return to sales page"
+            title={
+              !sale
+                ? "Register a new sale"
+                : "Save changes and return to sales page"
+            }
             className="uppercase font-semibold text-xs flex ml-auto px-5 p-2 rounded-lg hover:bg-slate-900 hover:text-slate-100 bg-slate-400 text-slate-900"
           />
         </div>

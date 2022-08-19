@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   PencilSimpleLine,
   TrashSimple,
@@ -5,7 +6,6 @@ import {
   ThumbsDown,
   Hourglass,
 } from "phosphor-react";
-import { useState } from "react";
 
 const ButtonGroup = ({ admin, handler, sid, callback, status }) => {
   const statuses = ["pending", "approved", "rejected"];
@@ -138,7 +138,7 @@ const SaleCard = ({ sale, admin = 0, handler }) => {
         status={status}
         callback={(newStatus) => setStatus(newStatus)}
       />
-      <div className="flex flex-col flex-grow rounded-lg p-2 max-w-full bg-slate-100 relative">
+      <div className=" flex flex-col flex-grow rounded-lg p-2 max-w-full bg-slate-100 relative">
         <div className="text-slate-500 text-xs mr-auto absolute ">{date}</div>
         <h1 className="text-slate-900 text-lg leading-none font-medium mx-auto">
           {product}{" "}

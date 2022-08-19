@@ -15,9 +15,7 @@ const Edit = ({ sale }) => {
     }
   }, [loading, authUser, router]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  if (loading) return;
   // prevent who's not sale's seller to edit it
   else if (authUser?.uid !== sale.seller.authUserId) {
     return <h1 className="text-4xl p-6 text-center">Not allowed.</h1>;
@@ -29,7 +27,7 @@ const Edit = ({ sale }) => {
 export default Edit;
 
 export async function getStaticProps(context) {
-  // get sale accessed
+  // get sale information from accessed id
   const sale = await getSaleById(context.params.sid);
   return {
     props: {

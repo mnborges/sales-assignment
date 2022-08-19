@@ -26,20 +26,23 @@ export default function Navbar({ page }) {
 
   return (
     !loading && (
-      <nav className=" rounded text-slate-700 bg-blue-300 p-2 w-full sticky top-0 flex flex-row justify-start ">
-        {page == "Home" && (
-          <div className="flex-grow">Welcome, {authUser?.email} !</div>
-        )}
-        {page != "Home" && (
-          <div className="flex-grow">
+      <nav className="rounded border-slate-900 text-slate-100 bg-slate-800 p-2 w-full sticky top-0 flex flex-row justify-start ">
+        <div className="flex-grow cursor-default">
+          {page == "Home" && (
+            <>
+              Welcome,{" "}
+              <span className="text-slate-400 ">{authUser?.email}</span> !
+            </>
+          )}
+          {page != "Home" && (
             <Link href={"/"}>
               <a className="flex gap-1 w-fit">
                 <ArrowUUpLeft size={20} />
                 Return to homepage
               </a>
             </Link>
-          </div>
-        )}
+          )}
+        </div>
         <button
           className="group px-4 rounded-xl flex gap-1 w-fit justify-self-end self-end ali"
           onClick={handleSignOut}
