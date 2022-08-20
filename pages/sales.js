@@ -10,6 +10,9 @@ import {
   updateSale,
   getAuthenticatedUser,
 } from "../lib/sanityData";
+import { overlayDrafts } from "../lib/sanity.server";
+import { usePreviewSubscription } from "../lib/sanity";
+import { salesQuery } from "../lib/queries";
 
 const SHOULD_MOCK = false;
 
@@ -87,7 +90,12 @@ const MonthSummary = ({ sales }) => {
   );
 };
 
-export default function Sales({ sales }) {
+export default function Sales({ allSales: initialSales, preview }) {
+  const { data: allSales } = usePreviewSubscription(salesQuery, {
+    initialData: initialSales,
+    enabled: preview,
+  });
+  const sales = allSales || [];
   const { loading, authUser } = useAuth();
   const router = useRouter();
   const [userRole, setUserRole] = useState(null);
@@ -176,7 +184,7 @@ export default function Sales({ sales }) {
     )
   );
 }
-export async function getStaticProps() {
+export async function getStaticProps({ preview = false }) {
   const mockSales = [
     {
       _createdAt: "2022-08-03T20:46:06Z",
@@ -201,12 +209,16 @@ export async function getStaticProps() {
     },
   ];
   // ternary to make mocking easier
-  const sales = SHOULD_MOCK ? mockSales : await getSales();
+  const allSales = SHOULD_MOCK
+    ? mockSales
+    : overlayDrafts(await getSales(preview));
 
   return {
     props: {
-      sales,
+      allSales,
+      preview,
     },
+    revalidate: process.env.SANITY_REVALIDATE_SECRET ? undefined : 60,
   };
 }
 
