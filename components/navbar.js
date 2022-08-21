@@ -3,9 +3,10 @@ import { useAuth } from "../context/AuthUserContext";
 import { ArrowUUpLeft, SignOut } from "phosphor-react";
 import Link from "next/link";
 
-export default function Navbar({ page }) {
+export default function Navbar() {
   const router = useRouter();
   const { logOut, authUser, loading } = useAuth();
+  const page = router.pathname;
 
   // sign user out and redirect to login page
   const handleSignOut = () => {
@@ -18,13 +19,13 @@ export default function Navbar({ page }) {
     !loading && (
       <div className="rounded border-slate-900 text-slate-100 bg-slate-800 p-2 w-full sticky top-0 flex flex-row justify-start ">
         <div className="flex-grow cursor-default">
-          {page == "Home" && (
+          {page == "/" && (
             <>
               Welcome,{" "}
               <span className="text-slate-400 ">{authUser?.email}</span> !
             </>
           )}
-          {page != "Home" && (
+          {page != "/" && (
             <Link href={"/"}>
               <a className="flex gap-1 w-fit">
                 <ArrowUUpLeft size={20} />
@@ -39,7 +40,7 @@ export default function Navbar({ page }) {
           data-bs-toggle="tooltip"
           title="Sign out"
         >
-          {page != "Home" && authUser.email}
+          {page != "/" && authUser.email}
           <span className="group-hover:translate-x-1">
             <SignOut size={24} />
           </span>
