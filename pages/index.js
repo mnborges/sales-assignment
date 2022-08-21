@@ -40,13 +40,13 @@ export default function Home() {
       subtext: "Register a new sale",
       link: "register",
     });
-  }
+  } /*
   useEffect(() => {
     //user not registered
     if (!loading && !authUser) router.push("/login");
     //user logged in
     if (!loading && authUser) {
-      /*
+      
       // IIFE to update userRole state
       (async () => await getAuthenticatedUser(authUser.uid))()
         .then(({ role }) => {
@@ -54,29 +54,26 @@ export default function Home() {
         })
         .catch((e) => {
           throw new Error(e.message);
-        });*/
+        });
     }
-  }, [loading, authUser, router]);
-
+  }, [loading, authUser, router]);*/
   if (loading /*|| !userRole*/) return;
   return (
-    authUser && (
-      <div>
-        <div className="p-10 my-5">
-          <h1 className=" leading-relaxed text-7xl font-bold text-center text-slate-900">
-            Saleasy
-          </h1>
-          <p className="text-2xl text-center text-slate-800">
-            The most uncomplicated sales administration app
-          </p>
-        </div>
-        <div className="mt-5 flex flex-row justify-evenly gap-2 flex-wrap">
-          {pages?.map((page, index) => (
-            <Card key={index} page={page} />
-          ))}
-        </div>
+    /*authUser &&*/ <div>
+      <div className="p-10 my-5">
+        <h1 className=" leading-relaxed text-7xl font-bold text-center text-slate-900">
+          Saleasy
+        </h1>
+        <p className="text-2xl text-center text-slate-800">
+          The most uncomplicated sales administration app
+        </p>
       </div>
-    )
+      <div className="mt-5 flex flex-row justify-evenly gap-2 flex-wrap">
+        {pages?.map((page, index) => (
+          <Card key={index} page={page} />
+        ))}
+      </div>
+    </div>
   );
 }
 
