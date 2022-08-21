@@ -1,21 +1,11 @@
 import { useRouter } from "next/router";
 import { useAuth } from "../context/AuthUserContext";
 import { ArrowUUpLeft, SignOut } from "phosphor-react";
-import { getAuthenticatedUser } from "../lib/sanityData";
-import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function Navbar({ page }) {
   const router = useRouter();
   const { logOut, authUser, loading } = useAuth();
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const getUser = async () => await getAuthenticatedUser(authUser?.uid);
-    if (!loading) {
-      getUser().then((res) => setUser(res));
-    }
-  }, [loading, authUser]);
 
   // sign user out and redirect to login page
   const handleSignOut = () => {
@@ -26,7 +16,7 @@ export default function Navbar({ page }) {
 
   return (
     !loading && (
-      <nav className="rounded border-slate-900 text-slate-100 bg-slate-800 p-2 w-full sticky top-0 flex flex-row justify-start ">
+      <div className="rounded border-slate-900 text-slate-100 bg-slate-800 p-2 w-full sticky top-0 flex flex-row justify-start ">
         <div className="flex-grow cursor-default">
           {page == "Home" && (
             <>
@@ -54,7 +44,7 @@ export default function Navbar({ page }) {
             <SignOut size={24} />
           </span>
         </button>
-      </nav>
+      </div>
     )
   );
 }

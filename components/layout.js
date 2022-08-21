@@ -9,7 +9,7 @@ export default function Layout({ children, title = "Saleasy" }) {
         <title>{title}</title>
       </Head>
 
-      {/*<Navbar page={children.type.name} /> */}
+      {<Navbar page={children.type.name} />}
 
       <main>{children}</main>
 
