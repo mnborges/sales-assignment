@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useRef } from "react";
 import { createSanityUser } from "../lib/sanityData";
 import Head from "next/head";
+
 // Login page: authenticates user
 export default function Login() {
   const router = useRouter();

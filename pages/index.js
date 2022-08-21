@@ -46,6 +46,7 @@ export default function Home() {
     if (!loading && !authUser) router.push("/login");
     //user logged in
     if (!loading && authUser) {
+      /*
       // IIFE to update userRole state
       (async () => await getAuthenticatedUser(authUser.uid))()
         .then(({ role }) => {
@@ -53,11 +54,11 @@ export default function Home() {
         })
         .catch((e) => {
           throw new Error(e.message);
-        });
+        });*/
     }
   }, [loading, authUser, router]);
 
-  if (loading || !userRole) return;
+  if (loading /*|| !userRole*/) return;
   return (
     authUser && (
       <div>
